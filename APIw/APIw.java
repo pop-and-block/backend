@@ -11,7 +11,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-public class APIW
+import org.json.JSONObject;
+
+public class APIw
 {
 	public static void main(String []args)
 	{
@@ -23,7 +25,16 @@ public class APIW
 		// Making the HTTP request
 		client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
 			.thenApply(HttpResponse::body)
-			.thenAccept(System.out::println)
+			.thenApply(APIw::parse)
 			.join();
+	}
+
+	public static String parse(String responseBody)
+	{
+		JSONObject market_stats = new JSONObject(responseBody);
+
+		System.out.println(market_stats);
+
+		return null;
 	}
 }
