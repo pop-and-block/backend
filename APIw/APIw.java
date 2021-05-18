@@ -1,40 +1,73 @@
 /*
-	A wrapper package that returns a JSON object from the WazirX API. 
+	A wrapper package that returns a JSON object from the WazirX API. Returns one of the four API endpoints
+	1. MARKET STATUS
+	2. MARKET TICKER
+	3. MARKET DEPTH
+	4. MARKET TRADE HISTORY
 
-	Don't shove data directly into fronted, please.
+	Don't shove data directly into the front-end, please.
+
+	Note to self: You CAN'T pass JSONObjects between funtions. Use strings instead, duh
+
+	TODO: 	1. Fix DEPTH and TRADES endpoint (need to mention market)
+			2. Make it async
 */
-
-//
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+import java.io.IOException;
+
 import org.json.JSONObject;
+import org.json.JSONArray;
 
-public class APIw
+public final class APIw
 {
-	public static void main(String []args)
-	{
-		String uri = "https://api.wazirx.com/api/v2/market-status";
+	// Non-changing vars
+	private static final String[] endpoints = {"market-status", "tickers", "depth", "trades"};
+	private static final String uri = "https://api.wazirx.com/api/v2/";
 
+	private static String getJSONFromURI(String uri)
+	{
 		HttpClient client = HttpClient.newHttpClient();
 		HttpRequest request = HttpRequest.newBuilder().uri(URI.create(uri)).build();
 		
-		// Making the HTTP request
-		client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-			.thenApply(HttpResponse::body)
-			.thenApply(APIw::parse)
-			.join();
+		try
+		{
+			// Making the HTTP request
+			HttpResponse response = client.send(request, HttpResponse.BodyHandlers.ofString());
+			return response.body().toString();
+		}
+
+		catch(Exception e)
+		{
+			System.out.println("Something bad happened: " + e);
+			return null;
+		}
 	}
 
-	public static String parse(String responseBody)
+	public static String getJSONEndPoint(String endpoint)
 	{
-		JSONObject market_stats = new JSONObject(responseBody);
+		boolean isEndPoint = false;
+		
+		for(String cur_endpoint : endpoints)
+		{
+			if(cur_endpoint.equals(endpoint))
+			{
+				isEndPoint = true;
+				break;
+			}
+		}
 
-		System.out.println(market_stats);
+		// Terminate program if invalid enpoint is found
+		if(!isEndPoint)
+		{
+			System.out.println("Invalid endpoint entered!! Terminating application immediately!");
+			System.exit(0);
+		}
 
-		return null;
+		return getJSONFromURI(uri + endpoint);
 	}
 }
