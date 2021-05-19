@@ -9,8 +9,7 @@
 
 	Note to self: You CAN'T pass JSONObjects between funtions. Use strings instead, duh
 
-	TODO: 	1. Fix DEPTH and TRADES endpoint (need to mention market)
-			2. Make it async
+	TODO: 	1. Make the API fetch async
 */
 
 import java.net.URI;
@@ -48,26 +47,33 @@ public final class APIw
 		}
 	}
 
-	public static String getJSONEndPoint(String endpoint)
+	public static String getJSONEndPoint(String endpoint, String market)
 	{
 		boolean isEndPoint = false;
+
+		int counter = 0;
 		
 		for(String cur_endpoint : endpoints)
 		{
-			if(cur_endpoint.equals(endpoint))
+			if(cur_endpoint.contains(endpoint))
 			{
 				isEndPoint = true;
 				break;
 			}
+			counter++;
 		}
 
-		// Terminate program if invalid enpoint is found
-		if(!isEndPoint)
+		// Terminate program if invalid enpoint is found OR if market isn't provided
+		if(!isEndPoint || (counter >= 2 && market.length() ==0 ))
 		{
 			System.out.println("Invalid endpoint entered!! Terminating application immediately!");
 			System.exit(0);
 		}
 
-		return getJSONFromURI(uri + endpoint);
+		if(market.length() == 0)
+			return getJSONFromURI(uri + endpoint);
+		
+		// Else
+		return getJSONFromURI(uri + endpoint + "?market=" + market);
 	}
 }
