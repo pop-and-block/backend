@@ -13,9 +13,9 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-public class APIc
+public final class APIc
 {
-	public static void main(String []args)
+	public static String getMarketJSONData()
 	{
 		JSONObject chart_stuff = new JSONObject();
 		try(InputStream stream = Files.newInputStream(Paths.get("res.json")))
@@ -60,6 +60,6 @@ public class APIc
 			ioe.printStackTrace();
 		}
 		
-		System.out.println(chart_stuff);
+		return chart_stuff.toString();
 	}
 }
